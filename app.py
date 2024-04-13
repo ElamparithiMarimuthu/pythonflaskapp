@@ -1,11 +1,14 @@
 from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
-# Replace 'mysql' with your database dialect if it's different (e.g., 'postgresql')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://Elamparithi:Elam1234@pythonflaskdb.cryu0guau2c1.us-east-2.rds.amazonaws.com:3306/pythonflaskdb'
+# Set the default value for SECRET_KEY
+app.config['SECRET_KEY'] = "secretgymapp"
+# Set the DATABASE_URI from environment variables
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -46,5 +49,7 @@ def gym_details():
     return render_template('gym_details.html')
 
 if __name__ == '__main__':
+    # Create database tables if they don't exist
     db.create_all()
-    app.run(debug=True)
+    # Run the Flask application
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
